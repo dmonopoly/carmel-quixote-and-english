@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
   // Get LM data for WFSA.
   map<Notation, double> data;  // Storage for log probabilities and counts.
   vector<string> tag_list;
-  bool found = TagGrammarFinder::GetTagGrammarFromOrganizedRows(
+  bool found = TagGrammarFinder::GetBigramTagGrammarFromOrganizedRows(
       filename_for_bigrams, &data, &tag_list);
   if (!found) {
     cerr << "Error getting tag grammar." << endl;
@@ -71,23 +71,16 @@ int main(int argc, char *argv[]) {
   ofstream fout;
   fout.open(WFSA_FILE.c_str());
   fout << "END" << endl;
-  // Create links to end. Assign a uniform small probability for each. Make sure
-  // to take a bit off the unigram probabilities accordingly so the sum of all
-  // probabilities exiting a node is 1.
-  double prob_to_end = .0001;
-  double small_compensation = prob_to_end / tag_list.size();
+  double prob_to_end = .00001;
   // Unigram probs.
   for (auto s : tag_list) {
     string node_name = s;
     Notation n("P", {s});
     try {
-      double prob = data.at(n) - small_compensation;
+      double prob = data.at(n);
       WriteLine(fout, "START", node_name, EMPTY, s, prob, "!");
-//       fout << "(START (" << node_name << " *e* \"" << s << "\" " << prob <<
-//         "!))" << endl;
+      // End probs.
       WriteLine(fout, node_name, "END", EMPTY, EMPTY, prob_to_end, "!");
-//       fout << "(" << node_name << " (END" << " *e* *e* " << prob_to_end << "!))"
-//         << endl;
     } catch (out_of_range &e) {
       cerr << "Out of range error for notation " << n << "; " << e.what() <<
         endl;
@@ -102,8 +95,7 @@ int main(int argc, char *argv[]) {
       string node2_name = s2;
       try {
         double prob = data.at(n);
-        fout << "(" << node1_name << " (" << node2_name << " *e* \"" << s2 << "\" " << prob <<
-          "!))" << endl;
+        WriteLine(fout, node1_name, node2_name, EMPTY, s2, prob, "!");
       } catch (out_of_range &e) {
         cerr << "Out of range error for notation " << n << "; " << e.what() <<
           endl;

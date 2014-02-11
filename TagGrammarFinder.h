@@ -1,8 +1,10 @@
 // Reads count data and determines P(x), P(x|y), P(y|x), etc. for all tags x,y.
+// Does trigrams now!
 
 #ifndef TAG_GRAMMAR_H_
 #define TAG_GRAMMAR_H_
 
+#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -27,8 +29,11 @@ namespace TagGrammarFinder {
   // 39429 e _
   // 36767 o _
   // 27626 _ e
-  bool GetTagGrammarFromOrganizedRows(const string &filename,
+  bool GetBigramTagGrammarFromOrganizedRows(const string &filename,
                                       map<Notation, double> *data,
                                       vector<string> *tag_list);
+  bool GetTrigramTagGrammarFromOrganizedRows(const string &filename,
+                                             map<Notation, double> *data,
+                                             vector<string> *tag_list);
 }
 #endif // End TAG_GRAMMAR_H_
