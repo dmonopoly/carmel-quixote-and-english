@@ -71,17 +71,14 @@ int main(int argc, char *argv[]) {
   // Create links to end. Assign a uniform small probability for each. Make sure
   // to take a bit off the unigram probabilities accordingly so the sum of all
   // probabilities exiting a node is 1.
-  double prob_to_end = .0001;
-  double small_compensation = prob_to_end / tag_list.size();
+  double prob_to_end = .00001;
   // Unigram probs: START->x
-  WriteLine(fout, "START", "END", EMPTY, EMPTY, prob_to_end, "!");
   for (auto s : tag_list) {
     string node_name = s;
     Notation n("P", {s});
     try {
-      double prob = data.at(n) - small_compensation;
+      double prob = data.at(n);
       WriteLine(fout, "START", node_name, EMPTY, s, prob, "!");
-      WriteLine(fout, node_name, "START", EMPTY, EMPTY, .0001, "!"); // Sometimes go back for unigram prob again.
     } catch (out_of_range &e) {
       cerr << "Out of range error for notation " << n << "; " << e.what() <<
         endl;
@@ -93,15 +90,10 @@ int main(int argc, char *argv[]) {
     for (auto s2 : tag_list) {
       Notation n("P", {s2}, TagGrammarFinder::GIVEN_DELIM, {s1});
       string node1_name = s1;
-      // Middle separator prevents "r" & "rr" name clash.
       string node2_name = node1_name + NODE_NAME_DELIM + s2;
       try {
         double prob = data.at(n);
         WriteLine(fout, node1_name, node2_name, EMPTY, s2, prob, "!");
-        // Reset to START edge. Sometimes go back to unigram.
-        WriteLine(fout, node2_name, "START", EMPTY, EMPTY, .0001, "!");
-        // Sometimes finish.
-        WriteLine(fout, node2_name, "END", EMPTY, EMPTY, .0001, "!");
       } catch (out_of_range &e) {
         cerr << "Out of range error for notation " << n << "; " << e.what() <<
           endl;
@@ -109,7 +101,7 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-  // Trigram probs. xy->yz, xy->z TODO
+  // Trigram probs. xy->yz, xy->z
   for (auto s1 : tag_list) {
     for (auto s2 : tag_list) {
       for (auto s3 : tag_list) {
@@ -125,18 +117,15 @@ int main(int argc, char *argv[]) {
             endl;
           exit(0);
         }
-        // Back-to-bigram edge.
-        Notation n2("P", {s3}, TagGrammarFinder::GIVEN_DELIM, {s2});
-        node2_name = s3;
-        try {
-          double prob = data.at(n2);
-          WriteLine(fout, node1_name, node2_name, EMPTY, s3, prob, "!");
-        } catch (out_of_range &e) {
-          cerr << "Out of range error for notation " << n << "; " << e.what() <<
-            endl;
-          exit(0);
-        }
       }
+    }
+  }
+  // End transitions.
+  for (auto s1 : tag_list) {
+    for (auto s2 : tag_list) {
+      string node1_name = s1 + NODE_NAME_DELIM + s2;
+      double prob = .00001;
+      WriteLine(fout, node1_name, "END", EMPTY, EMPTY, prob, "");
     }
   }
   fout.close();
