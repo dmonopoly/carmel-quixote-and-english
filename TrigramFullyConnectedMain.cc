@@ -15,6 +15,7 @@ const string WFSA_FILE = "cipher.wfsa";
 const string FST_FILE = "cipher.fst";
 const string EMPTY = "*e*";
 const string NODE_NAME_DELIM = "-";
+const double PROB_TO_END = .00001;
 
 void WriteLine(ofstream &fout, const string &node1, const string &node2,
     const string &first, const string &second, double prob, const string &end) {
@@ -68,10 +69,6 @@ int main(int argc, char *argv[]) {
   ofstream fout;
   fout.open(WFSA_FILE.c_str());
   fout << "END" << endl;
-  // Create links to end. Assign a uniform small probability for each. Make sure
-  // to take a bit off the unigram probabilities accordingly so the sum of all
-  // probabilities exiting a node is 1.
-  double prob_to_end = .00001;
   // Unigram probs: START->x
   for (auto s : tag_list) {
     string node_name = s;
@@ -124,8 +121,7 @@ int main(int argc, char *argv[]) {
   for (auto s1 : tag_list) {
     for (auto s2 : tag_list) {
       string node1_name = s1 + NODE_NAME_DELIM + s2;
-      double prob = .00001;
-      WriteLine(fout, node1_name, "END", EMPTY, EMPTY, prob, "");
+      WriteLine(fout, node1_name, "END", EMPTY, EMPTY, PROB_TO_END, "");
     }
   }
   fout.close();
@@ -135,7 +131,13 @@ int main(int argc, char *argv[]) {
   fout << 0 << endl;
   // Ad hoc: Assume _ is present for space. Deal with it separately from the
   // loop.
-//   obs_symbols.erase(obs_symbols.find("_"));
+  obs_symbols.erase(obs_symbols.find("_"));
+  for (int i = 0; i < tag_list.size(); ++i) {
+    if (tag_list[i] == "_") {
+      tag_list.erase(tag_list.begin() + i);
+      break;
+    }
+  }
   fout << "(0 (0 \"_\" \"_\"))" << endl;
   for (auto tag : tag_list) {
     for (auto obs : obs_symbols) {

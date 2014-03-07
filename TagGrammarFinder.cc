@@ -94,6 +94,7 @@ bool TagGrammarFinder::GetTrigramTagGrammarFromOrganizedRows(
     map<Notation, int> unigram_counts;
     map<Notation, int> bigram_counts;
     map<Notation, int> trigram_counts;
+    set<Notation> set_of_tri_counts; // For checking purposes.
     // Read trigram counts from file.
     int count;
     string sound1, sound2, sound3;
@@ -132,6 +133,14 @@ bool TagGrammarFinder::GetTrigramTagGrammarFromOrganizedRows(
                                  {sound1, sound2,
                                  TagGrammarFinder::ARB_SOUND_PLACEHOLDER},
                                  TagGrammarFinder::SEQ_DELIM);
+
+      auto iter = set_of_tri_counts.find(n_trigram_count_seq);
+      if (iter != set_of_tri_counts.end()) {
+        cerr << "Should not have seen this trigram count already." << endl;
+        cerr << "Notation: " << n_trigram_count_seq << endl;
+        return 1;
+      }
+      set_of_tri_counts.insert(n_trigram_count_seq);
       trigram_counts[n_trigram_count_seq] = count; // should only encounter once 
       trigram_counts[n_trigram_count_seq_total] += count;
 
@@ -172,16 +181,16 @@ bool TagGrammarFinder::GetTrigramTagGrammarFromOrganizedRows(
       }
     }
     // Trigrams.
+    // TODO
     double lambda1 = .9;
     for (auto s1 = sounds.begin(); s1 != sounds.end(); ++s1) {
       for (auto s2 = sounds.begin(); s2 != sounds.end(); ++s2) {
         for (auto s3 = sounds.begin(); s3 != sounds.end(); ++s3) {
           // P(w3|w1 w2)
           Notation nGiven("P", {*s3}, TagGrammarFinder::GIVEN_DELIM, {*s1,
-                            *s2});
+                          *s2});
           // C(w1 w2 w3)
-          Notation cW1W2W3("C", {*s1, *s2, *s3},
-                            TagGrammarFinder::SEQ_DELIM);
+          Notation cW1W2W3("C", {*s1, *s2, *s3}, TagGrammarFinder::SEQ_DELIM);
           // C(w1 w2)
           Notation cW1W2(TagGrammarFinder::SIGMA + "C",
               {*s1, *s2, TagGrammarFinder::ARB_SOUND_PLACEHOLDER},
@@ -189,30 +198,39 @@ bool TagGrammarFinder::GetTrigramTagGrammarFromOrganizedRows(
           Notation cW2W3(TagGrammarFinder::SIGMA + "C",
               {*s2, *s3, TagGrammarFinder::ARB_SOUND_PLACEHOLDER},
               TagGrammarFinder::SEQ_DELIM);
-
           // C(w2), C(w3)
           Notation cW2("C", {*s2});
           Notation cW3("C", {*s3});
 
           double val = 0;
-          if (bigram_counts.find(cW1W2) == bigram_counts.end()) {
+          // Fixed-lambda interpolation smoothing.
+          if (bigram_counts.find(cW1W2) == bigram_counts.end() || bigram_counts.at(cW1W2) == 0) {
             // Prevent divide by zero when this key does not exist.
             val = (double) (1 - lambda1) * (lambda2 * bigram_counts[cW2W3] / 
                   unigram_counts.at(cW2) + (1 - lambda2) *
                   unigram_counts.at(cW3) /
                   unigram_counts.at(n_count_total));
           } else {
-            val = (double) (lambda1 * trigram_counts[cW1W2W3] / 
-                bigram_counts.at(cW1W2)) +
-                (1 - lambda1) * (lambda2 * bigram_counts[cW2W3] / 
-                  unigram_counts.at(cW2) + (1 - lambda2) *
-                  unigram_counts.at(cW3) /
-                  unigram_counts.at(n_count_total));
+            double part1 = (double) (lambda1 * trigram_counts[cW1W2W3] / 
+                bigram_counts.at(cW1W2));
+            double part2 = (double) (lambda2 * bigram_counts[cW2W3] / 
+                                  unigram_counts.at(cW2) + (1 - lambda2) *
+                                  unigram_counts.at(cW3) /
+                                  unigram_counts.at(n_count_total));
+            val = part1 + (1 - lambda1) * part2;
+            // Above is same as this:
+//             val = (double) (lambda1 * trigram_counts[cW1W2W3] / 
+//                 bigram_counts.at(cW1W2)) +
+//                 (1 - lambda1) * (lambda2 * bigram_counts[cW2W3] / 
+//                   unigram_counts.at(cW2) + (1 - lambda2) *
+//                   unigram_counts.at(cW3) /
+//                   unigram_counts.at(n_count_total));
           }
+          // Check if value is not Nan or inf.
           if (isfinite(val))
             (*data)[nGiven] = val;
-          else
-            (*data)[nGiven] = .000000000001;
+//           else
+//             (*data)[nGiven] = .0001; // .000000000001;
         }
       }
     }

@@ -110,7 +110,13 @@ int main(int argc, char *argv[]) {
   fout << 0 << endl;
   // Ad hoc: Assume _ is present for space. Deal with it separately from the
   // loop.
-//   obs_symbols.erase(obs_symbols.find("_"));
+  obs_symbols.erase(obs_symbols.find("_"));
+  for (int i = 0; i < tag_list.size(); ++i) {
+    if (tag_list[i] == "_") {
+      tag_list.erase(tag_list.begin() + i);
+      break;
+    }
+  }
   fout << "(0 (0 \"_\" \"_\"))" << endl;
   for (auto tag : tag_list) {
     for (auto obs : obs_symbols) {
