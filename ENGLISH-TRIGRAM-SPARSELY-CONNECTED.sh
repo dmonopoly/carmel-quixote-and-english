@@ -1,6 +1,6 @@
-# DON'T USE
+# Bad results - why? I just get the cipher data as output.
 cipher_file='Ciphers/eng.cypher.quoted.txt'
-clang++ -stdlib=libc++ -std=c++11 TrigramFullyConnectedMain.cc EMViterbiPackage/Notation.cc CypherReader.cc TagGrammarFinder.cc
+clang++ -stdlib=libc++ -std=c++11 TrigramSparseMain.cc EMViterbiPackage/Notation.cc CypherReader.cc TagGrammarFinder.cc
 ./a.out LanguageModels/eng.trigram.counts.txt $cipher_file
 carmel --train-cascade -HJ -X .99999 -: -! 5 $cipher_file cipher.wfsa cipher.fst 
 carmel --project-right --project-identity-fsa -HJ cipher.wfsa > cipher.wfsa.noe 

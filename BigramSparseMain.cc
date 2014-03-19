@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  // Begin writing out the WFSA. TODO: CHECK THIS
+  // Begin writing out the WFSA.
   ofstream fout;
   fout.open(WFSA_FILE.c_str());
   fout << "END" << endl;

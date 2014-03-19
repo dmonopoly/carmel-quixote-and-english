@@ -55,6 +55,7 @@ bool TagGrammarFinder::GetBigramTagGrammarFromOrganizedRows(
       }
     }
     // Bigrams.
+    double lambda = .9;
     for (auto s1 = sounds.begin(); s1 != sounds.end(); ++s1) {
       for (auto s2 = sounds.begin(); s2 != sounds.end(); ++s2) {
         Notation nGiven("P", {*s2}, TagGrammarFinder::GIVEN_DELIM, {*s1});
@@ -64,7 +65,7 @@ bool TagGrammarFinder::GetBigramTagGrammarFromOrganizedRows(
             {TagGrammarFinder::ARB_SOUND_PLACEHOLDER});
         // Fixed-lambda interpolation smoothing.
         Notation n_count_s2("C", {*s2});
-        double val = (double) (.9 * bigram_counts[n_count_seq] / // note the square brackets which default to 0 if not found
+        double val = (double) (lambda * bigram_counts[n_count_seq] / // note the square brackets which default to 0 if not found
           bigram_counts.at(n_count_seq_total)) +
           .1 * unigram_counts.at(n_count_s2) / unigram_counts.at(n_count_total);
         // Old:

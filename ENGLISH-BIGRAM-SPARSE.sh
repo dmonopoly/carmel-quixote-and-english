@@ -1,4 +1,4 @@
-cipher_file='Ciphers/eng.cypher.quoted_and_new_lined.txt'
+cipher_file='Ciphers/eng.cypher.quoted.txt'
 clang++ -stdlib=libc++ -std=c++11 BigramSparseMain.cc EMViterbiPackage/Notation.cc CypherReader.cc TagGrammarFinder.cc
 ./a.out LanguageModels/eng.bigram.counts.txt $cipher_file
 carmel --train-cascade -HJ -X .99999 -: -! 5 $cipher_file cipher.wfsa cipher.fst 

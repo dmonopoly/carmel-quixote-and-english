@@ -24,7 +24,7 @@ def main():
     fout.write("\n")
 
 if len(sys.argv) != 3:
-  print 'Usage: python <exec> <target-file1> <target-file2>'
+  print 'Usage: python <exec> <file-to-read> <file-to-write-to>'
 else:
   main()
 
