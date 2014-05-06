@@ -30,8 +30,8 @@ namespace TagGrammarFinder {
   // 36767 o _
   // 27626 _ e
   bool GetBigramTagGrammarFromOrganizedRows(const string &filename,
-                                      map<Notation, double> *data,
-                                      vector<string> *tag_list);
+                                            map<Notation, double> *data,
+                                            vector<string> *tag_list);
   bool GetTrigramTagGrammarFromOrganizedRows(const string &filename,
                                              map<Notation, double> *data,
                                              vector<string> *tag_list);

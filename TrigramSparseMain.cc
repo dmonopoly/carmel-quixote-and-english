@@ -63,9 +63,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  // Begin writing out the WFSA, fully connected version.
-  // START goes to every tag (unigram). Every tag goes back to START also (to
-  // allow unigram usage again), and also to END.
+  // Begin writing out the WFSA, sparsely connected version.
   ofstream fout;
   fout.open(WFSA_FILE.c_str());
   fout << "END" << endl;

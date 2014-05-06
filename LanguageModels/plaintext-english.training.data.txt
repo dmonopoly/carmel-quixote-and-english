@@ -1,0 +1,27 @@
+Academic attacks are often against weakened versions of a cryptosystem such as
+a block cipher or hash function with some rounds removed Many but not all
+attacks become exponentially more difficult to execute as rounds are added to a
+cryptosystem so its possible for the full cryptosystem to be strong even
+though reducedround variants are weak Nonetheless partial breaks that come
+close to breaking the original cryptosystem may mean that a full break will
+follow the successful attacks on and  were all preceded by
+attacks on weakened versions
+
+In academic cryptography a weakness or a break in a scheme is usually defined
+quite conservatively it might require impractical amounts of time memory or
+known plaintexts It also might require the attacker be able to do things many
+realworld attackers cant for example the attacker may need to choose
+particular plaintexts to be encrypted or even to ask for plaintexts to be
+encrypted using several keys related to the secret key Furthermore it might
+only reveal a small amount of information enough to prove the cryptosystem
+imperfect but too little to be useful to realworld attackers Finally an
+attack might only apply to a weakened version of cryptographic tools like a
+reducedround block cipher as a step towards breaking of the full system
+
+Cryptanalysis has coevolved together with cryptography and the contest can be traced through the history of cryptography new ciphers being designed to replace old broken designs and new cryptanalytic techniques invented to crack the improved schemes In practice they are viewed as two sides of the same coin in order to create secure cryptography you have to design against possible cryptanalysis citation needed
+
+Successful cryptanalysis has undoubtedly influenced history the ability to read the presumedsecret thoughts and plans of others can be a decisive advantage For example in England in 1587 Mary Queen of Scots was tried and executed for treason as a result of her involvement in three plots to assassinate Elizabeth I of England The plans came to light after her coded correspondence with fellow conspirators was deciphered by Thomas Phelippes
+
+In World War I the breaking of the Zimmermann Telegram was instrumental in bringing the United States into the war In World War II the Allies benefitted enormously from their joint success cryptanalysis of the German ciphers including the Enigma machine and the Lorenz cipher and Japanese ciphers particularly Purple and JN25 Ultra intelligence has been credited with everything between shortening the end of the European war by up to two years to determining the eventual result The war in the Pacific was similarly helped by Magic intelligence
+
+Governments have long recognized the potential benefits of cryptanalysis for intelligence both military and diplomatic and established dedicated organizations devoted to breaking the codes and ciphers of other nations for example GCHQ and the NSA organizations which are still very active today In 2004 it was reported that the United States had broken Iranian ciphers It is unknown however whether this was pure cryptanalysis or whether other factors were involved
