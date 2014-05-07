@@ -6,7 +6,7 @@
 #include <set>
 
 #include "EMViterbiPackage/Notation.h"
-#include "TagGrammarFinder.h"
+#include "TagGrammarFinderSparse.h"
 #include "CypherReader.h"
 
 using namespace std;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
   // Get LM data for WFSA.
   map<Notation, double> data;  // Storage for log probabilities and counts.
   vector<string> tag_list;
-  bool found = TagGrammarFinder::GetTrigramTagGrammarFromOrganizedRows(
+  bool found = TagGrammarFinderSparse::GetTrigramTagGrammarFromOrganizedRows(
       filename_for_bigrams, &data, &tag_list);
   if (!found) {
     cerr << "Error getting tag grammar." << endl;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
   double lambda1 = .9;
   for (auto s1 : tag_list) {
     for (auto s2 : tag_list) {
-      Notation n("P", {s2}, TagGrammarFinder::GIVEN_DELIM, {s1});
+      Notation n("P", {s2}, TagGrammarFinderSparse::GIVEN_DELIM, {s1});
       string node1_name = s1;
       string node1_name_sharp = s1 + "#";
       string node2_name = s1 + NODE_NAME_DELIM + s2;
@@ -132,13 +132,14 @@ int main(int argc, char *argv[]) {
   for (auto s1 : tag_list) {
     for (auto s2 : tag_list) {
       for (auto s3 : tag_list) {
-        Notation n("P", {s3}, TagGrammarFinder::GIVEN_DELIM, {s1, s2});
+        Notation n("P", {s3}, TagGrammarFinderSparse::GIVEN_DELIM, {s1, s2});
         string node1_name_sharp = s1 + NODE_NAME_DELIM + s2 + "#";
         string node2_name = s2 + NODE_NAME_DELIM + s3;
         try {
           double prob = data.at(n);
           // Trigram prob path, if prob is available.
-          WriteLine(fout, node1_name_sharp, node2_name, EMPTY, s3, prob, "!");
+          if (prob != 0)
+            WriteLine(fout, node1_name_sharp, node2_name, EMPTY, s3, prob, "!");
         } catch (out_of_range &e) {
           // We expect some probabilities to be nonexistent. In these cases,
           // reduce the number of edges.
