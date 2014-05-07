@@ -1,5 +1,6 @@
 // Generates a sparse WFSA based on the given bigram counts file and the FST
 // using the given cypher and the counts file.
+// TODO: not confirmed. Still runs slower than fully connected version, oddly.
 
 #include <iostream>
 #include <fstream>
@@ -9,7 +10,7 @@
 #include <set>
 
 #include "EMViterbiPackage/Notation.h"
-#include "TagGrammarFinder.h"
+#include "TagGrammarFinderSparse.h"
 #include "CypherReader.h"
 
 using namespace std;
@@ -45,7 +46,7 @@ int main(int argc, char *argv[]) {
   // Get LM data for WFSA.
   map<Notation, double> data;  // Storage for log probabilities and counts.
   vector<string> tag_list;
-  bool found = TagGrammarFinder::GetBigramTagGrammarFromOrganizedRows(
+  bool found = TagGrammarFinderSparse::GetBigramTagGrammarFromOrganizedRows(
       filename_for_bigrams, &data, &tag_list);
   if (!found) {
     cerr << "Error getting tag grammar." << endl;
@@ -94,13 +95,14 @@ int main(int argc, char *argv[]) {
   // Bigram probs.
   for (auto s1 : tag_list) {
     for (auto s2 : tag_list) {
-      Notation n("P", {s2}, TagGrammarFinder::GIVEN_DELIM, {s1});
+      Notation n("P", {s2}, TagGrammarFinderSparse::GIVEN_DELIM, {s1});
       string node1_name_sharp = s1 + "#";
       string node2_name = s2;
       try {
         double prob = data.at(n);
         // Bigram prob - node sharp to node.
-        WriteLine(fout, node1_name_sharp, node2_name, EMPTY, s2, prob, "!");
+        if (prob != 0)
+          WriteLine(fout, node1_name_sharp, node2_name, EMPTY, s2, prob, "!");
       } catch (out_of_range &e) {
         cerr << "Out of range error for notation " << n << "; " << e.what() <<
           endl;
